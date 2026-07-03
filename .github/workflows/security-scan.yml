@@ -23,16 +23,18 @@ jobs:
 
       - name: Run Trivy Scan
         uses: aquasecurity/trivy-action@master
-        continue-on-error: true   # ← Added
+        continue-on-error: true
         with:
           image-ref: 'compose-app-web:latest'
           format: 'table'
           severity: 'HIGH,CRITICAL'
           exit-code: '0'
           ignore-unfixed: true
+          output: 'trivy-output.txt'   # ← Output File Name
 
       - name: Upload Scan Report
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: trivy-report
-          path: /tmp/trivy-output.txt
+          path: trivy-output.txt   # ← File Path (same as output)
