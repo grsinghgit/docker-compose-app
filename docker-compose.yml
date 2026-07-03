@@ -4,6 +4,7 @@ services:
   # ---- Web App Service ----
   web:
     build: ./web      # web फ़ोल्डर में मौजूद Dockerfile से Build करें
+    image: compose-app-web:latest   # ← Fixed Image Name (Trivy Scan के लिए)
     ports:
       - "8080:5000"   # Host Port 8080 -> Container Port 5000
     environment:

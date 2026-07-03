@@ -21,7 +21,7 @@ jobs:
         run: |
           docker compose build
 
-      - name: List Docker Images (Find Correct Image Name)
+      - name: List Docker Images (Debug)
         run: |
           docker images
 
@@ -36,12 +36,17 @@ jobs:
       - name: Run Trivy Scan
         continue-on-error: true
         run: |
+          touch trivy-output.txt
+
           trivy image \
             --severity HIGH,CRITICAL \
             --ignore-unfixed \
             --format table \
             --output trivy-output.txt \
             compose-app-web:latest
+
+          echo "========== Scan Report =========="
+          cat trivy-output.txt || true
 
       - name: Upload Scan Report
         uses: actions/upload-artifact@v4
