@@ -27,8 +27,9 @@ jobs:
 
       - name: Save Docker Image
         run: |
-          docker tag compose-app-web:latest compose-app-web:latest
-          docker save compose-app-web:latest -o compose-app-web.tar
+          IMAGE_NAME=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "<none>" | head -n 1)
+          echo "Saving image: $IMAGE_NAME"
+          docker save $IMAGE_NAME -o compose-app-web.tar
 
       - name: Run Trivy Scan
         continue-on-error: true
