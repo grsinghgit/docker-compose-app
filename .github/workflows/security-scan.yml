@@ -17,17 +17,24 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker Image
+      - name: Build and Save Docker Image
         run: |
           docker compose build
+          docker save compose-app-web:latest -o compose-app-web.tar
+
+      - name: List Docker Images (Debug)
+        run: |
+          docker images
 
       - name: Run Trivy Scan
         continue-on-error: true
         run: |
           docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v $(pwd):/data \
             aquasecurity/trivy:latest \
-            image --severity HIGH,CRITICAL --ignore-unfixed compose-app-web:latest > trivy-output.txt
+            image --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --input /data/compose-app-web.tar > trivy-output.txt 2>&1
 
       - name: Upload Scan Report
         uses: actions/upload-artifact@v4
