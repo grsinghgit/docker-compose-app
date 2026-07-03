@@ -21,16 +21,17 @@ jobs:
         run: |
           docker compose build
 
-      - name: List Docker Images (Find Image Name)
+      - name: List Docker Images (Find Correct Image Name)
         run: |
           docker images
 
-      - name: Install Trivy
+      - name: Install Trivy (Official Script)
         run: |
-          sudo apt-get update
-          sudo apt-get install -y wget
-          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.deb
-          sudo dpkg -i trivy_Linux-64bit.deb
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
+      - name: Verify Trivy Installation
+        run: |
+          trivy --version
 
       - name: Run Trivy Scan
         continue-on-error: true
