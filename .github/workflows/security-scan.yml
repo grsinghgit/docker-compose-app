@@ -22,19 +22,16 @@ jobs:
           docker compose build
 
       - name: Run Trivy Scan
-        uses: aquasecurity/trivy-action@master
         continue-on-error: true
-        with:
-          image-ref: 'compose-app-web:latest'
-          format: 'table'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '0'
-          ignore-unfixed: true
-          output: 'trivy-output.txt'   # ← Output File Name
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasecurity/trivy:latest \
+            image --severity HIGH,CRITICAL --ignore-unfixed compose-app-web:latest > trivy-output.txt
 
       - name: Upload Scan Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: trivy-report
-          path: trivy-output.txt   # ← File Path (same as output)
+          path: trivy-output.txt
