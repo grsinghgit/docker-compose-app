@@ -40,7 +40,6 @@ jobs:
 
           trivy image \
             --severity HIGH,CRITICAL \
-            --ignore-unfixed \
             --format table \
             --output trivy-output.txt \
             compose-app-web:latest
