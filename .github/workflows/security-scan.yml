@@ -21,25 +21,26 @@ jobs:
         run: |
           docker compose build
 
-      - name: List Docker Images (Debug)
+      - name: List Docker Images (Find Image Name)
         run: |
           docker images
 
-      - name: Save Docker Image
+      - name: Install Trivy
         run: |
-          IMAGE_NAME=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "<none>" | head -n 1)
-          echo "Saving image: $IMAGE_NAME"
-          docker save $IMAGE_NAME -o compose-app-web.tar
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.deb
+          sudo dpkg -i trivy_Linux-64bit.deb
 
       - name: Run Trivy Scan
         continue-on-error: true
         run: |
-          docker run --rm \
-            -v $(pwd):/data \
-            aquasecurity/trivy:latest \
-            image --severity HIGH,CRITICAL \
+          trivy image \
+            --severity HIGH,CRITICAL \
             --ignore-unfixed \
-            --input /data/compose-app-web.tar > trivy-output.txt 2>&1
+            --format table \
+            --output trivy-output.txt \
+            compose-app-web:latest
 
       - name: Upload Scan Report
         uses: actions/upload-artifact@v4
